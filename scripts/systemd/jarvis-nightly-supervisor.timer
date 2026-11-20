@@ -1,0 +1,11 @@
+[Unit]
+Description=Check nightly deployments and retry queued reports every minute
+
+[Timer]
+OnBootSec=2min
+OnUnitActiveSec=1min
+AccuracySec=5s
+Unit=jarvis-nightly-supervisor.service
+
+[Install]
+WantedBy=timers.target

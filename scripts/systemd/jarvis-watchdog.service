@@ -1,0 +1,19 @@
+[Unit]
+Description=Independent Jarvis Discord heartbeat watchdog
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+Type=simple
+WorkingDirectory=%h/Projects/jarvis-discord-bot
+EnvironmentFile=%h/Projects/jarvis-discord-bot/.env
+ExecStart=%h/Projects/jarvis-discord-bot/.venv/bin/python -m jarvis_bot.watchdog --channel-id 900000000000000006 --interval 30 --maximum-heartbeat-age 45 --failure-threshold 3 --recovery-threshold 2
+Restart=always
+RestartSec=5
+UMask=0077
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=full
+
+[Install]
+WantedBy=default.target

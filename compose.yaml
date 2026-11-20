@@ -1,0 +1,59 @@
+name: jarvis
+
+services:
+  jarvis:
+    container_name: jarvis-discord
+    build:
+      context: .
+      args:
+        HOST_UID: "${HOST_UID:-1000}"
+        HOST_GID: "${HOST_GID:-1000}"
+        HOST_HOME: "${JARVIS_HOST_HOME:?Set JARVIS_HOST_HOME to the dedicated host user's absolute home path}"
+    image: jarvis-discord:local
+    init: true
+    user: "${HOST_UID:-1000}:${HOST_GID:-1000}"
+    env_file:
+      - .env
+    environment:
+      HOME: "${JARVIS_HOST_HOME}"
+      XDG_RUNTIME_DIR: "/run/user/${HOST_UID:-1000}"
+      CODEX_BINARY: "${JARVIS_CODEX_BINARY:?Set JARVIS_CODEX_BINARY to the host CLI executable}"
+      CODEX_WORKDIR: "${JARVIS_WORKSPACE_HOST:?Set JARVIS_WORKSPACE_HOST to an absolute path inside the mounted home}"
+      MEMORY_DATABASE_PATH: /opt/jarvis/data/jarvis.sqlite3
+      SERVER_IDENTITIES_PATH: /opt/jarvis/data/server-identities.json
+      TELEMETRY_PATH: /opt/jarvis/data/request-telemetry.jsonl
+      PROGRESS_PATH: /opt/jarvis/data/live-progress.json
+      JARVIS_HEARTBEAT_PATH: /opt/jarvis/data/jarvis-heartbeat.json
+      PYTHONUNBUFFERED: "1"
+      TZ: ${WORK_CALENDAR_TIMEZONE:-America/Chicago}
+    volumes:
+      - type: bind
+        source: ./data
+        target: /opt/jarvis/data
+      - type: bind
+        source: "${JARVIS_HOST_HOME}"
+        target: "${JARVIS_HOST_HOME}"
+    read_only: true
+    tmpfs:
+      - /tmp:rw,nosuid,nodev,noexec,mode=1777
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    pids_limit: 512
+    stop_grace_period: 30s
+    restart: unless-stopped
+    healthcheck:
+      test:
+        - CMD
+        - python
+        - -c
+        - >-
+          import os; from pathlib import Path; from jarvis_bot.health import
+          heartbeat_is_healthy; raise SystemExit(0 if
+          heartbeat_is_healthy(Path(os.environ['JARVIS_HEARTBEAT_PATH']),
+          maximum_age_seconds=45) else 1)
+      interval: 10s
+      timeout: 5s
+      retries: 6
+      start_period: 30s

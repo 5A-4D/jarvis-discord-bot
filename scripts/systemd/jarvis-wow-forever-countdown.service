@@ -1,0 +1,7 @@
+[Unit]
+Description=Post the WoW Forever release countdown to Discord
+
+[Service]
+Type=oneshot
+WorkingDirectory=%h/Projects/jarvis-discord-bot
+ExecStart=%h/Projects/jarvis-discord-bot/.venv/bin/python -m jarvis_bot.send_countdown --channel-id 900000000000000002

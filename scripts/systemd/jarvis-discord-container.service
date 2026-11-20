@@ -1,0 +1,18 @@
+[Unit]
+Description=Jarvis Discord AI assistant (Docker)
+Documentation=file://%h/Projects/jarvis-discord-bot/README.md
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+WorkingDirectory=%h/Projects/jarvis-discord-bot
+ExecStart=%h/Projects/jarvis-discord-bot/scripts/docker-cli compose --project-name jarvis --file compose.yaml up --detach --no-build --wait --wait-timeout 120
+ExecReload=%h/Projects/jarvis-discord-bot/scripts/docker-cli compose --project-name jarvis --file compose.yaml restart jarvis
+ExecStop=%h/Projects/jarvis-discord-bot/scripts/docker-cli compose --project-name jarvis --file compose.yaml stop --timeout 30 jarvis
+TimeoutStartSec=150
+TimeoutStopSec=45
+
+[Install]
+WantedBy=default.target

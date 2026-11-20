@@ -1,0 +1,77 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+service_name="jarvis-discord.service"
+container_name="jarvis-discord"
+project_root="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd)"
+docker_cli="${project_root}/scripts/docker-cli"
+reply_lock="${project_root}/data/discord-replies.lock"
+
+if [[ "${1:-}" != "--worker" ]]; then
+    unit_name="jarvis-restart-after-reply-$(date +%s)-$$"
+    systemd-run \
+        --user \
+        --unit="$unit_name" \
+        --collect \
+        "$(realpath "$0")" --worker >/dev/null
+    systemctl --user is-active --quiet "${unit_name}.service"
+    printf 'Queued %s; it will restart after the active Codex turn exits.\n' "$unit_name"
+    exit 0
+fi
+
+codex_is_active() {
+    local control_group cgroup_file process_id process_name container_running process_table
+
+    # Docker requires a PID column in custom ps output. A failed lookup must
+    # never be treated as evidence that the active request has finished.
+    if ! container_running=$("$docker_cli" inspect --format '{{.State.Running}}' "$container_name" 2>/dev/null); then
+        return 0
+    fi
+    if [[ "$container_running" == true ]]; then
+        if ! process_table=$("$docker_cli" top "$container_name" -eo pid,comm 2>/dev/null); then
+            return 0
+        fi
+        if [[ "$process_table" != PID* ]]; then
+            return 0
+        fi
+        awk 'NR > 1 && ($2 == "codex" || $2 ~ /^codex-/) { found=1 } END { exit !found }' <<< "$process_table"
+        return
+    fi
+
+    control_group="$(systemctl --user show "$service_name" --property=ControlGroup --value)"
+    cgroup_file="/sys/fs/cgroup${control_group}/cgroup.procs"
+    [[ -r "$cgroup_file" ]] || return 1
+
+    while IFS= read -r process_id; do
+        [[ "$process_id" =~ ^[1-9][0-9]*$ ]] || continue
+        [[ -r "/proc/${process_id}/comm" ]] || continue
+        process_name="$(<"/proc/${process_id}/comm")"
+        if [[ "$process_name" == "codex" || "$process_name" == codex-* ]]; then
+            return 0
+        fi
+    done < "$cgroup_file"
+    return 1
+}
+
+# The process check protects older running builds. The shared lock in newer
+# builds also covers the parent handler's final Discord delivery after CLI exit.
+while codex_is_active; do
+    sleep 2
+done
+
+while true; do
+    sleep 5
+    if ! codex_is_active; then
+        # Hold the exclusive barrier through restart so an existing handler can
+        # never be stopped between generation and delivery of its final reply.
+        exec 9>>"$reply_lock"
+        if flock --exclusive --nonblock 9; then
+            systemctl --user restart "$service_name"
+            exit 0
+        fi
+        exec 9>&-
+    fi
+    while codex_is_active; do
+        sleep 2
+    done
+done

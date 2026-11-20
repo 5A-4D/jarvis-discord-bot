@@ -1,0 +1,10 @@
+discord.py[voice]==2.7.1
+davey==0.1.6
+discord-ext-voice-recv-dave @ git+https://github.com/jstewart0788/discord-ext-voice-recv-dave.git@78fcb434a3484f2abf54cf89e80e86b651e5c28d
+faster-whisper==1.2.1
+# faster-whisper 1.2.1 uses metadata_errors, removed by PyAV 19.
+av==18.1.0
+python-dotenv==1.2.4
+Pillow==12.2.0
+icalendar==7.3.0
+recurring-ical-events==3.8.2

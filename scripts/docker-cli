@@ -1,0 +1,15 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+if /usr/bin/docker info >/dev/null 2>&1; then
+    exec /usr/bin/docker "$@"
+fi
+
+account_name="$(id -un)"
+if ! id -nG "$account_name" | tr ' ' '\n' | grep -qx docker; then
+    printf '%s\n' "${account_name} is not a member of the docker group" >&2
+    exit 1
+fi
+
+printf -v docker_command '%q ' /usr/bin/docker "$@"
+exec /usr/bin/sg docker -c "$docker_command"

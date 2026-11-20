@@ -1,0 +1,11 @@
+[Unit]
+Description=Improve Jarvis daily at 2 AM Central
+
+[Timer]
+OnCalendar=*-*-* 02:00:00 America/Chicago
+AccuracySec=1min
+Persistent=false
+Unit=jarvis-nightly-improvement.service
+
+[Install]
+WantedBy=timers.target

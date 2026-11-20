@@ -1,0 +1,16 @@
+[Unit]
+Description=Jarvis Docker status collector (host)
+After=network-online.target
+
+[Service]
+Type=simple
+WorkingDirectory=%h/Projects/jarvis-discord-bot
+ExecStart=/usr/bin/python3 -B -m jarvis_bot.container_status --interval 30
+Restart=always
+RestartSec=5
+UMask=0077
+# docker-cli uses the account's existing docker-group membership through sg.
+# User-namespace filesystem isolation prevents that group switch on this host.
+
+[Install]
+WantedBy=default.target

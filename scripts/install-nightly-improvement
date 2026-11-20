@@ -1,0 +1,60 @@
+#!/usr/bin/env python3
+"""Install the owner-authorised controller without restarting the Discord bot."""
+import json
+import os
+import shutil
+import subprocess
+import sys
+import tomllib
+from pathlib import Path
+
+from dotenv import dotenv_values
+
+os.umask(0o077)
+project = Path(__file__).resolve().parents[1]
+state = Path.home() / '.local/share/jarvis-maintenance'
+install = Path.home() / '.local/lib/jarvis-maintenance'
+units = Path.home() / '.config/systemd/user'
+golden = Path((state / 'golden-path').read_text().strip())
+sys.path.insert(0, str(project / 'scripts'))
+from nightly_improvement import EDITABLE, verify_golden
+verify_golden(golden)
+install.mkdir(parents=True, exist_ok=True, mode=0o700)
+install.chmod(0o700)
+(state / 'runs').mkdir(exist_ok=True, mode=0o700)
+for src, dst in [('nightly_improvement.py', 'nightly.py'),
+                 ('nightly-worker-prompt.txt', 'worker-prompt.txt'),
+                 ('nightly-review-prompt.txt', 'review-prompt.txt'),
+                 ('nightly-owner-brief.txt', 'brief.txt')]:
+    target = install / dst
+    shutil.copy2(project / 'scripts' / src, target)
+    target.chmod(0o600)
+policy = {'codex_binary': str(Path.home() / '.local/bin/codex'),
+          'minimum_five_hour_remaining': 40, 'minimum_week_remaining': 20,
+          'minimum_after_run_remaining': 25, 'timezone': 'America/Chicago'}
+existing = install / 'policy.json'
+if existing.exists():
+    policy.update(json.loads(existing.read_text()))
+# Refresh scope metadata after merging old policy so reinstalling cannot restore
+# the calendar permission removed by the owner on 2026-11-06.
+policy['automatic_edit_scope'] = sorted(Path(name).name for name in EDITABLE) + [
+    'new non-schedule feature helpers', 'new non-schedule tests', 'README.md']
+# Preserve Jarvis's chosen model/effort without copying secret-bearing config.
+environment = dotenv_values(project / '.env')
+config = Path.home() / '.codex/config.toml'
+settings = tomllib.loads(config.read_text()) if config.exists() else {}
+policy.setdefault('model', environment.get('CODEX_MODEL') or settings.get('model'))
+policy.setdefault('reasoning_effort', environment.get('CODEX_REASONING_EFFORT') or settings.get('model_reasoning_effort'))
+(install / 'policy.json').write_text(json.dumps(policy, indent=2)+'\n')
+units.mkdir(parents=True, exist_ok=True)
+for name in ('jarvis-nightly-improvement.service', 'jarvis-nightly-improvement.timer',
+             'jarvis-nightly-supervisor.service', 'jarvis-nightly-supervisor.timer'):
+    shutil.copy2(project / 'scripts/systemd' / name, units / name)
+    (units / name).chmod(0o600)
+subprocess.run(['systemctl', '--user', 'daemon-reload'], check=True)
+subprocess.run(['systemd-analyze', '--user', 'verify',
+                str(units / 'jarvis-nightly-improvement.service'),
+                str(units / 'jarvis-nightly-improvement.timer'),
+                str(units / 'jarvis-nightly-supervisor.service'),
+                str(units / 'jarvis-nightly-supervisor.timer')], check=True)
+print('Controller installed. Timers are not enabled by this installer; verify before enabling.')

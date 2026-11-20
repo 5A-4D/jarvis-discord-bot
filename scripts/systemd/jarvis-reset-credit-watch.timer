@@ -1,0 +1,11 @@
+[Unit]
+Description=Check Codex earned-reset expiries hourly
+
+[Timer]
+OnCalendar=hourly
+Persistent=true
+RandomizedDelaySec=60
+Unit=jarvis-reset-credit-watch.service
+
+[Install]
+WantedBy=timers.target

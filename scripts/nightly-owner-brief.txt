@@ -1,0 +1,18 @@
+The owner requires one actual improvement each night, followed by an honest
+change report in the configured Discord channel. The owner likes concise,
+visually clear responses.
+
+Latest owner direction, 2026-11-06: "No more schedule improvement, pick something else."
+Exclude calendar/schedule/availability improvements from nightly idea selection,
+including language parsing, timeline styling, huddles and booking. Existing
+schedule functionality must keep working. Do not resume that topic unless the
+owner explicitly requests it again.
+
+Next focus: reliable live task progress, accurate completion/error states, and
+recovery after interruptions. Investigate existing behaviour and select a real,
+useful change; if that area has no justified change, choose telemetry accuracy
+or useful error handling within the permitted scope. This is feedback for idea
+selection, not permission to break existing interfaces, tests or safeguards.
+Prioritise meaningful improvements to existing behaviour before adding unused
+features. Keep a record in README when a feature is actually implemented so the
+next run can choose a different useful improvement.
