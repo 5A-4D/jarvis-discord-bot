@@ -1,0 +1,79 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="1220" viewBox="0 0 1600 1220" role="img" aria-labelledby="title description">
+<title id="title">Jarvis Discord Assistant architecture</title>
+<desc id="description">Discord inputs enter invocation and permission routing. Requests follow deterministic commands, an owner Codex route, or a separate restricted public route. Results pass through verified reply delivery back to Discord. Scoped memory, progress and telemetry, an independent watchdog and a maintenance controller support the system. No deployment identifiers or personal data are shown.</desc>
+<defs><marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10Z" fill="#7dd3fc"/></marker></defs>
+<style>text{font-family:DejaVu Sans,Arial,sans-serif}.title{font-size:42px;font-weight:700;fill:#f8fafc}.sub{font-size:20px;fill:#b9cbe0}.lane{font-size:17px;font-weight:700;letter-spacing:2px;fill:#93c5fd}.heading{font-size:25px;font-weight:700;fill:#f1f5f9}.support{font-size:21px;font-weight:700;fill:#f1f5f9}.body{font-size:18px;fill:#c4d1e3}.small{font-size:15px;fill:#b7c8df}.label{font-size:15px;font-weight:700;fill:#bae6fd}</style>
+<rect width="1600" height="1220" rx="24" fill="#0b1220"/>
+
+<text x="60" y="76" class="title">Jarvis Discord Assistant</text>
+<text x="62" y="117" class="sub">Request routing, execution scopes and operational support</text>
+<text x="65" y="178" class="lane">01  INPUT AND VERIFIED DELIVERY</text>
+<rect x="80" y="235" width="310" height="145" rx="18" fill="#142238" stroke="#30465f"/>
+<text x="103" y="274" class="heading">Discord</text>
+<text x="103" y="312" class="body">Messages · images · voice</text>
+<text x="103" y="340" class="body">Authorized invocations</text>
+<rect x="610" y="235" width="380" height="145" rx="18" fill="#142238" stroke="#30465f"/>
+<text x="633" y="274" class="heading">Input + access routing</text>
+<text x="633" y="312" class="body">Voice / image processing</text>
+<text x="633" y="340" class="body">Owner and public classification</text>
+<rect x="1220" y="235" width="300" height="145" rx="18" fill="#142238" stroke="#30465f"/>
+<text x="1243" y="274" class="heading">Reply delivery</text>
+<text x="1243" y="312" class="body">Reply guard + attachments</text>
+<text x="1243" y="340" class="body">Completion verification</text>
+<path d="M390 307 H605" fill="none" stroke="#7dd3fc" stroke-width="2.5" marker-end="url(#arrow)"/>
+<text x="465" y="291" class="label">Requests</text>
+<path d="M1370 235 V205 H235 V230" fill="none" stroke="#7dd3fc" stroke-width="2.5" marker-end="url(#arrow)"/>
+<text x="635" y="194" class="label">Verified replies + live updates</text>
+<text x="65" y="420" class="lane">02  EXECUTION ROUTES</text>
+<path d="M800 380 V435" fill="none" stroke="#7dd3fc" stroke-width="2.5"/>
+<path d="M280 435 H1320" fill="none" stroke="#7dd3fc" stroke-width="2.5"/>
+<path d="M280 435 V475" fill="none" stroke="#7dd3fc" stroke-width="2.5" marker-end="url(#arrow)"/>
+<path d="M800 435 V475" fill="none" stroke="#7dd3fc" stroke-width="2.5" marker-end="url(#arrow)"/>
+<path d="M1320 435 V475" fill="none" stroke="#7dd3fc" stroke-width="2.5" marker-end="url(#arrow)"/>
+<rect x="80" y="480" width="400" height="215" rx="18" fill="#102b30" stroke="#2d756e"/>
+<text x="103" y="519" class="heading">Deterministic commands</text>
+<text x="103" y="557" class="body">Reminders + schedules</text>
+<text x="103" y="585" class="body">Container / VPN status reports</text>
+<text x="103" y="613" class="body">No model invocation</text>
+<rect x="600" y="480" width="400" height="215" rx="18" fill="#292332" stroke="#77603b"/>
+<text x="623" y="519" class="heading">Owner Codex route</text>
+<text x="623" y="557" class="body">Persistent owner context</text>
+<text x="623" y="585" class="body">Configured workspace authority</text>
+<text x="623" y="613" class="body">Local CLI execution</text>
+<rect x="1120" y="480" width="400" height="215" rx="18" fill="#152842" stroke="#476bb0"/>
+<text x="1143" y="519" class="heading">Restricted public route</text>
+<text x="1143" y="557" class="body">Separate ephemeral execution</text>
+<text x="1143" y="585" class="body">Scoped member context</text>
+<text x="1143" y="613" class="body">Constrained tool access</text>
+<path d="M280 695 V745" fill="none" stroke="#7dd3fc" stroke-width="2.5"/>
+<path d="M800 695 V745" fill="none" stroke="#7dd3fc" stroke-width="2.5"/>
+<path d="M1320 695 V745" fill="none" stroke="#7dd3fc" stroke-width="2.5"/>
+<path d="M280 745 H1560 V307 H1525" fill="none" stroke="#7dd3fc" stroke-width="2.5" marker-end="url(#arrow)"/>
+<text x="1357" y="730" class="label">Results</text>
+<text x="82" y="786" class="small">Execution results are checked and delivered separately from generation.</text>
+<text x="65" y="840" class="lane">03  STATE AND OPERATIONAL SUPPORT</text>
+<rect x="80" y="870" width="320" height="176" rx="18" fill="#142238" stroke="#30465f"/>
+<text x="103" y="909" class="support">Scoped memory</text>
+<text x="103" y="947" class="body">SQLite conversations</text>
+<text x="103" y="975" class="body">User / channel boundaries</text>
+<text x="103" y="1003" class="body">Sensitive local state</text>
+<rect x="450" y="870" width="320" height="176" rx="18" fill="#142238" stroke="#30465f"/>
+<text x="473" y="909" class="support">Progress + telemetry</text>
+<text x="473" y="947" class="body">Live task updates</text>
+<text x="473" y="975" class="body">Timing and usage</text>
+<text x="473" y="1003" class="body">Content-free measurements</text>
+<rect x="820" y="870" width="320" height="176" rx="18" fill="#142238" stroke="#30465f"/>
+<text x="843" y="909" class="support">Independent watchdog</text>
+<text x="843" y="947" class="body">Heartbeat checks</text>
+<text x="843" y="975" class="body">Queued outage notices</text>
+<text x="843" y="1003" class="body">Recovery ordering</text>
+<rect x="1190" y="870" width="330" height="176" rx="18" fill="#142238" stroke="#30465f"/>
+<text x="1213" y="909" class="support">Maintenance runner</text>
+<text x="1213" y="947" class="body">Isolated checks / review</text>
+<text x="1213" y="975" class="body">Checkpoints + rollback</text>
+<text x="1213" y="1003" class="body">Host-controlled deployment</text>
+<rect x="60" y="1090" width="1480" height="85" rx="16" fill="#142338" stroke="#31465f"/>
+<text x="82" y="1122" class="lane">ACCESS BOUNDARIES</text>
+<text x="335" y="1122" class="body">Owner authority follows host configuration. Public requests use separate contexts and tool limits.</text>
+<text x="82" y="1151" class="small">Conceptual architecture · no real accounts, device addresses, calendars or conversations · private portfolio snapshot</text>
+</svg>

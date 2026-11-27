@@ -26,22 +26,9 @@ databases, backups, and the original operational Git history are excluded.
 
 ## Architecture
 
-```mermaid
-flowchart LR
-    Discord[Discord text, images and voice] --> Router[Invocation and permission routing]
-    Router --> Commands[Deterministic commands]
-    Router --> Assistant[Codex CLI adapter]
-    Router --> Voice[Local transcription]
-    Voice --> Assistant
-    Voice --> Memory[(SQLite memory)]
-    Memory --> Assistant
-    Assistant --> Progress[Progress and telemetry]
-    Assistant --> Replies[Verified reply delivery]
-    Commands --> Replies
-    Progress --> Discord
-    Replies --> Discord
-    Watchdog[Independent watchdog] --> Discord
-```
+![Jarvis request routing and operational architecture](docs/images/architecture.png)
+
+[View the vector diagram](docs/images/architecture.svg).
 
 See [architecture and data flow](docs/architecture.md),
 [configuration and operations](docs/operations.md), and

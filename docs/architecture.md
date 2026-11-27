@@ -1,5 +1,32 @@
 # Architecture and data flow
 
+![Jarvis architecture overview](images/architecture.png)
+
+[Download the vector diagram](images/architecture.svg). This overview shows the
+remaining request paths and supporting modules without deployment-specific data.
+
+<details>
+<summary>Editable Mermaid flow diagram</summary>
+
+```mermaid
+flowchart LR
+    Discord[Discord text, images and voice] --> Router[Invocation and permission routing]
+    Router --> Commands[Deterministic commands]
+    Router --> Assistant[Codex CLI adapter]
+    Router --> Voice[Local transcription]
+    Voice --> Assistant
+    Voice --> Memory[(SQLite memory)]
+    Memory --> Assistant
+    Assistant --> Progress[Progress and telemetry]
+    Assistant --> Replies[Verified reply delivery]
+    Commands --> Replies
+    Progress --> Discord
+    Replies --> Discord
+    Watchdog[Independent watchdog] --> Discord
+```
+
+</details>
+
 ## Request lifecycle
 
 1. `main.py` starts `JarvisDiscordClient` with settings from the local environment.
