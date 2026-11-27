@@ -29,9 +29,9 @@
 | `progress.py`, `telemetry.py`, `reply_guard.py` | Progress publication, content-free telemetry and delivery barriers. |
 | `health.py`, `watchdog.py` | Heartbeats, outage observations and notification recovery. |
 | `container_status.py`, `vpn_status.py` | Infrastructure status adapters. |
-| `handoff.py`, `giveaways.py` | Bounded fallback and verified reward-event delivery. |
+| `handoff.py` | Bounded bot fallback and loop prevention. |
 | `dm_copy.py`, `dm_reply_watch.py` | Configured DM copies and explicit reply watches. |
-| `wow_grudges.py`, `reply_gif.py` | Optional server-specific features. |
+| `reply_gif.py` | Optional one-use reply artwork. |
 | `scripts/nightly_improvement.py` | Host-controlled maintenance, review, recovery and reporting. |
 
 ## Data boundaries

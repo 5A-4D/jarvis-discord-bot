@@ -155,8 +155,6 @@ class Settings:
     heartbeat_path: Path = Path("./data/jarvis-heartbeat.json")
     heartbeat_interval_seconds: int = 10
     progress_channel_id: int | None = None
-    giveaway_database_path: Path | None = None
-    giveaway_channel_id: int | None = None
     codex_model: str | None = None
     codex_reasoning_effort: str | None = None
     codex_unlimited_timeout_user_ids: frozenset[int] = frozenset()
@@ -189,9 +187,6 @@ class Settings:
     work_day_end: str = "16:00"
     work_morning_huddle_enabled: bool = False
     dm_copy_owner_id: int | None = None
-    wow_grudge_public_enabled: bool = False
-    wow_grudge_guild_id: int | None = None
-    wow_grudge_channel_id: int | None = None
 
     @classmethod
     def from_env(cls) -> "Settings":
@@ -201,11 +196,6 @@ class Settings:
             raise ValueError("JARVIS_TRIGGER cannot be empty")
 
         stored_messages = _positive_int("MEMORY_MAX_STORED_MESSAGES", 200)
-        grudge_public = _boolean("WOW_GRUDGE_PUBLIC_ENABLED", False)
-        grudge_guild = _optional_id("WOW_GRUDGE_GUILD_ID")
-        grudge_channel = _optional_id("WOW_GRUDGE_CHANNEL_ID")
-        if grudge_public and (grudge_guild is None or grudge_channel is None):
-            raise ValueError("Public WoW grudges require WOW_GRUDGE_GUILD_ID and WOW_GRUDGE_CHANNEL_ID")
         owner_ids = _id_set("AUTHORIZED_USER_IDS", required=True)
         unlimited_timeout_ids = _id_set("CODEX_UNLIMITED_TIMEOUT_USER_IDS")
         if not unlimited_timeout_ids <= owner_ids:
@@ -307,11 +297,6 @@ class Settings:
                 "JARVIS_HEARTBEAT_INTERVAL_SECONDS", 10
             ),
             progress_channel_id=_optional_id("PROGRESS_CHANNEL_ID"),
-            giveaway_database_path=(
-                Path(os.environ["GIVEAWAY_DATABASE_PATH"]).expanduser()
-                if os.getenv("GIVEAWAY_DATABASE_PATH", "").strip() else None
-            ),
-            giveaway_channel_id=_optional_id("GIVEAWAY_CHANNEL_ID"),
             codex_model=os.getenv("CODEX_MODEL", "").strip() or None,
             codex_reasoning_effort=(
                 os.getenv("CODEX_REASONING_EFFORT", "").strip() or None
@@ -384,7 +369,4 @@ class Settings:
             work_day_start=work_start,
             work_day_end=work_end,
             work_morning_huddle_enabled=_boolean("WORK_MORNING_HUDDLE_ENABLED", False),
-            wow_grudge_public_enabled=grudge_public,
-            wow_grudge_guild_id=grudge_guild,
-            wow_grudge_channel_id=grudge_channel,
         )

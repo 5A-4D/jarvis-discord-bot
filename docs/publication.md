@@ -4,6 +4,9 @@ This private repository was prepared on November 20, 2026 from an existing
 personal Jarvis deployment. The initial publication commit is a sanitized source
 snapshot; it does not import the original deployment's Git history.
 
+The portfolio scope was narrowed on November 27, 2026. The validation below
+reflects the remaining features in the current snapshot.
+
 ## Included
 
 - Application modules, including implemented features that were not yet committed
@@ -37,7 +40,7 @@ supporting evidence, not a guarantee that every possible sensitive value is dete
 
 ## Validation
 
-- 528 regression tests passed in the existing Python 3.13 runtime image, with
+- 510 regression tests passed in the existing Python 3.13 runtime image, with
   network disabled, source mounted read-only, capabilities dropped, and no
   production home, data, credentials, Docker socket or systemd bus mounted.
 - Python source parsing and shell syntax checks passed.

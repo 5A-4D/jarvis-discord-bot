@@ -21,7 +21,7 @@ databases, backups, and the original operational Git history are excluded.
 | Progress | Terminal viewer and an edited Discord dashboard, including task checklists and recovery after interrupted updates. |
 | Operations | Heartbeat monitoring, queued outage/recovery notices, container status, and VPN status adapters. |
 | Scheduling | Anonymous calendar timelines, recurrence/cancellation handling, personal timed reminders, and release countdowns. |
-| Optional integrations | Bounded bot fallback, reward notifications, one-use reply artwork, DM reply watches, and a shared game list. |
+| Optional integrations | Bounded bot fallback, one-use reply artwork, and DM reply watches. |
 | Maintenance | Isolated nightly development/review, regression checks, recovery checkpoints, and deployment supervision. |
 
 ## Architecture

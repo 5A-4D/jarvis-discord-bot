@@ -386,25 +386,6 @@ systemctl --user is-active jarvis-watchdog.service
 sqlite3 data/jarvis.sqlite3 'PRAGMA quick_check;'
 ```
 
-## CSGORoll reward notifications
-
-An optional deterministic worker consumes account-specific confirmed rewards from
-the isolated browser service's SQLite outbox. Configure `GIVEAWAY_DATABASE_PATH`
-to its `data/events.sqlite3` file and `GIVEAWAY_CHANNEL_ID` to the destination
-channel. The existing `/home/your-user` container mount can access the queue without
-sharing the Discord token with the browser. Rebuild/redeploy Jarvis to activate
-new code and environment settings. The browser service can attempt recognized
-free giveaways and uses the signed-in account's transaction history to verify
-new rewards. Its initial historical records are baselined without announcements.
-
-The worker posts as Jarvis without invoking Codex and disables all mentions. Stable
-event IDs and Discord nonces suppress duplicates. A delivery interrupted by a
-crash or timeout is retained as `uncertain` for reconciliation instead of being
-automatically replayed beyond Discord's short nonce-deduplication window. This can
-require manual resolution of a missed notification. Browser setup and remaining
-site-adapter work are documented in
-`/home/your-user/Projects/csgoroll-giveaways/README.md`.
-
 ## Container reports
 
 `jarvis-container-status.service` runs a standard-library Python collector on
@@ -541,23 +522,6 @@ ephemeral command with a read-only sandbox and the shell, local-file, app, brows
 computer-control tools disabled. Hosted web search remains available. Human
 public text requests additionally permit the built-in image generation tool;
 voice/read-only helper turns do not gain this capability.
-
-## WoW grudge list
-
-Set `WOW_GRUDGE_GUILD_ID` and `WOW_GRUDGE_CHANNEL_ID` to the server and its WoW
-channel, then opt into human public additions with `WOW_GRUDGE_PUBLIC_ENABLED=true`.
-Members can say `Jarvis grudge add Character Name — reason` or
-`Jarvis add Character Name to the WoW grudge list because reason` in enabled
-public channels. In the configured WoW channel, `Jarvis add Name — reason` also
-works. `Jarvis grudge list` displays the shared list. Bots, webhooks, DMs and
-other guilds cannot change it. These deterministic commands grant only list
-viewing and additions, use no AI quota, and do not grant host access.
-
-Entries live beside the memory database in `wow-grudges.json` with author and
-source-message IDs. Writes are atomic and locked across concurrent requests.
-Duplicate character names are ignored without overwriting the original reason;
-public users cannot edit or remove entries. Limits are 500 entries, 80 characters
-per name and 500 per reason. Corrupt data is preserved and reported, never reset.
 
 ## Request telemetry
 

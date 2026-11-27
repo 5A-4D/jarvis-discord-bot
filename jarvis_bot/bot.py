@@ -17,7 +17,6 @@ from .config import Settings
 from .container_status import is_container_command, read_container_report
 from .dm_copy import copy_incoming_dm
 from .health import write_heartbeat
-from .giveaways import giveaway_worker
 from .handoff import (
     R_BOT_USER_ID, format_r_handoff, is_r_handoff_reply,
     safe_handoff_request, split_handoff_answer,
@@ -27,7 +26,6 @@ from .public_access import PublicDecision, classify_public_request
 from .public_images import is_public_image_request
 from .reply_guard import ReplyGuard
 from .reminders import ReminderStore, handle_reminder_request, reminder_worker
-from .wow_grudges import GrudgeStore, handle_request as handle_grudge_request
 from .reply_gif import TARGET_USER_ID as REPLY_GIF_USER_ID, append_once as append_reply_gif
 from .r_images import image_answer, is_r_image_request
 from .progress import LiveProgressStore, render_progress
@@ -457,14 +455,11 @@ class JarvisDiscordClient(discord.Client):
         self._history_task: asyncio.Task[None] | None = None
         self._progress_task: asyncio.Task[None] | None = None
         self._heartbeat_task: asyncio.Task[None] | None = None
-        self._giveaway_task: asyncio.Task[None] | None = None
         self._reminder_task: asyncio.Task[None] | None = None
         self._reminders = ReminderStore(settings.database_path.parent / 'reminders.sqlite3')
         self._progress_changed = asyncio.Event()
         self._public_request_lock = asyncio.Lock()
         self._reply_guard = ReplyGuard(settings.database_path.parent / 'discord-replies.lock')
-        self._wow_grudges = (GrudgeStore(settings.database_path.parent / 'wow-grudges.json', settings.wow_grudge_guild_id)
-                            if settings.wow_grudge_guild_id is not None else None)
         self._r_handoff_attempts: dict[int, None] = {}
         self._usage_cache: tuple[float, float] | None = None
         self._bot_invocations_enabled: bool | None = None
@@ -481,12 +476,6 @@ class JarvisDiscordClient(discord.Client):
         if self._reminder_task is None:
             self._reminder_task = asyncio.create_task(
                 reminder_worker(self, self._reminders), name='jarvis-reminders'
-            )
-        giveaway_path = getattr(self.settings, "giveaway_database_path", None)
-        giveaway_channel = getattr(self.settings, "giveaway_channel_id", None)
-        if giveaway_path is not None and giveaway_channel is not None and self._giveaway_task is None:
-            self._giveaway_task = asyncio.create_task(
-                giveaway_worker(self, giveaway_path, giveaway_channel), name="jarvis-giveaway-notifications"
             )
         if self._heartbeat_task is None:
             self._heartbeat_task = asyncio.create_task(
@@ -565,11 +554,6 @@ class JarvisDiscordClient(discord.Client):
             reminder_task.cancel()
             await asyncio.gather(reminder_task, return_exceptions=True)
             self._reminder_task = None
-        giveaway_task = getattr(self, "_giveaway_task", None)
-        if giveaway_task is not None:
-            giveaway_task.cancel()
-            await asyncio.gather(giveaway_task, return_exceptions=True)
-            self._giveaway_task = None
         if self._heartbeat_task is not None:
             self._heartbeat_task.cancel()
             await asyncio.gather(self._heartbeat_task, return_exceptions=True)
@@ -1725,9 +1709,6 @@ class JarvisDiscordClient(discord.Client):
             prompt = "Describe the attached image or images."
 
         if await handle_reminder_request(self, message, prompt, is_owner=is_owner):
-            return
-
-        if await handle_grudge_request(self, message, prompt, is_owner=is_owner):
             return
 
         # Deterministic availability only; public opt-in never grants AI/host access.
